@@ -24,51 +24,51 @@ import nju.lzx.Route.*;
 
 // TODO: Auto-generated Javadoc
 /**
- * Vehicle Routing Problem with Time Windows (VRPTW)Çó½âÊ¾Àı¡£.
+ * A Demo for Solving the Vehicle Routing Problem with Time Windows (VRPTW)ã€‚.
  */
 public class VRPTW {
 
 	
 	/**
-	 * Ö÷º¯Êı¡£.
+	 * Main Method.
 	 *
-	 * @param args ²ÎÊı¡£
-	 * @throws IOException IOÒì³£¡£
+	 * @param args Parametersã€‚
+	 * @throws IOException IO Exceptionã€‚
 	 */
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-		//System.setOut(new PrintStream(new FileOutputStream("log4.txt")));
 		double t1 = System.nanoTime();
-		Instance inst = load_instance("data/homberger_1000/c1_10_2.txt", 1000);
+		Instance inst = load_instance("../data/homberger_1000/c1_10_2.txt", 1000);
+		//set the target number of vehicles
 		inst.m = 90;
-		//ÉèÖÃÄ£Ê½²ÎÊı
+		//è®¾ç½®æ¨¡å¼å‚æ•°
 		inst.parameter.Mode.multi_thread_enable = true;
 		System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "8");
-		//ÉèÖÃ³õÊ¼½â²ÎÊı
+		//è®¾ç½®åˆå§‹è§£å‚æ•°
 		inst.parameter.InitialSolution.log_print = false;
-		//ÉèÖÃ½û¼ÉËÑË÷²ÎÊı
+		//è®¾ç½®ç¦å¿Œæœç´¢å‚æ•°
 		inst.parameter.TabuSearch.maximum_iteration = 50;
 		inst.parameter.TabuSearch.maximum_tabu_tenure = 100;
 		inst.parameter.TabuSearch.mininum_shake_tenure = 100;
 		inst.parameter.TabuSearch.minimum_shake_iteration = 50;
 		inst.parameter.TabuSearch.log_print = false;
 		inst.parameter.TabuSearch.log_detail = false;
-		//ÉèÖÃËã×Ó²ÎÊı
+		//è®¾ç½®ç®—å­å‚æ•°
 		inst.parameter.Operator.insertion_prune_threshhold = 1.0;
 		inst.parameter.Operator.exchange_prune_threshhold = 1.0;
 		inst.parameter.Operator.cross_prune_threshhold = 1.0;
 		inst.parameter.Operator.remove_prune_threshhold = 0.0;
 		inst.parameter.Operator.route_cross_threshhold = 1.5;
-		//ÉèÖÃ¼õÉÙ³µÁ¾Ëã·¨²ÎÊı
+		//è®¾ç½®å‡å°‘è½¦è¾†ç®—æ³•å‚æ•°
 		inst.parameter.VehicleReduction.insert_search_enable = true;
 		inst.parameter.VehicleReduction.cost_maximum_iteration = 100;
 		inst.parameter.VehicleReduction.outer_maximum_iteration = 100;
 		inst.parameter.VehicleReduction.random_remove_ratio = 0.05;
 		inst.parameter.VehicleReduction.log_print = true;
 		
-		System.out.println("Multiple Thread£º" + inst.parameter.Mode.multi_thread_enable);
+		System.out.println("Multiple Threadï¼š" + inst.parameter.Mode.multi_thread_enable);
 		
-		//¹¹ÔìÔ¼ÊøÌõ¼ş
+		//æ„é€ çº¦æŸæ¡ä»¶
 		Constraint[] cnts = new Constraint[3];
 		MinimizeDistance.ConstraintData dist_dat = new MinimizeDistance.ConstraintData(inst.d, 1);
 		cnts[0] = new MinimizeDistance(dist_dat, 1);
@@ -77,7 +77,7 @@ public class VRPTW {
 		TimeWindowConstraint.ConstraintData tw_dat = new TimeWindowConstraint.ConstraintData(inst.e, inst.l, inst.t, inst.s);
 		cnts[2] = new TimeWindowConstraint(tw_dat, true, 100);
 		
-		//¹¹ÔìËã·¨Ëã×Ó
+		//æ„é€ ç®—æ³•ç®—å­
 		Operator[] operators = new Operator[4];
 		double[] coefs = new double[4];
 		operators[0] = new RelocateBase(inst);
@@ -89,7 +89,7 @@ public class VRPTW {
 		operators[3] = new RelocateBaseIntra(inst);
 		coefs[3] = 1;
 		
-		//¹¹ÔìĞèÒª·ÃÎÊµÄ½Úµã¼¯ºÏ
+		//æ„é€ éœ€è¦è®¿é—®çš„èŠ‚ç‚¹é›†åˆ
 		ArrayList<Atr> atrs = new ArrayList<Atr>();
 		for(int i = 1; i < inst.n; i++){
 			atrs.add(new Atr(i));
@@ -98,7 +98,7 @@ public class VRPTW {
 		for(int i = 1; i < inst.n; i++)
 			exc[i] = true;
 		
-		//¹¹Ôì³õÊ¼½â
+		//æ„é€ åˆå§‹è§£
 		Greedy greedy = new Greedy(inst, new InsertBase(inst, cnts));
 		ArrayList<Route> s = greedy.generate(atrs);
 		System.out.println(greedy.toString(s));
@@ -106,7 +106,7 @@ public class VRPTW {
 		System.out.println("feasibility of the initial solution>>>" + greedy.is_feasible(s) + "\t" + s.size() + "\t" + greedy.get_total_cost(s));
 		//System.exit(0);
 		
-		//×îĞ¡»¯³µÁ¾ÊıÄ¿
+		//æœ€å°åŒ–è½¦è¾†æ•°ç›®
 		TabuSearch tabu = new TabuSearch(inst, operators, coefs);
 		VehicleMinimizeBase vmb = new VehicleMinimizeBase(inst);
 		VehicleReductionAlgo vra = new VehicleReductionAlgo(inst, tabu, vmb, inst.m, exc);
@@ -123,12 +123,12 @@ public class VRPTW {
 	}
 	
 	/**
-	 * ¼ÓÔØËãÀı¡£.
+	 * åŠ è½½ç®—ä¾‹ã€‚.
 	 *
-	 * @param path ËãÀıÂ·¾¶¡£
-	 * @param _n ¹Ë¿Í½ÚµãÊıÁ¿¡£
-	 * @return ·µ»ØËãÀı¡£
-	 * @throws FileNotFoundException IOÒì³£¡£
+	 * @param path ç®—ä¾‹è·¯å¾„ã€‚
+	 * @param _n é¡¾å®¢èŠ‚ç‚¹æ•°é‡ã€‚
+	 * @return è¿”å›ç®—ä¾‹ã€‚
+	 * @throws FileNotFoundException IOå¼‚å¸¸ã€‚
 	 */
 	public static Instance load_instance(String path, int _n) throws FileNotFoundException{
 		Instance inst = new Instance();
@@ -171,11 +171,11 @@ public class VRPTW {
 	}
 	
 	/**
-	 * ½«Ò»¸öÆÕÍ¨µÄ½â×ª»»³ÉÒ»¸ö¿ÉÒÔ±»ExchangeBaseDeepºÍRelocateBseIntra²Ù×÷µÄ½â£¬¼´Â·¾¶ÖĞ°üº¬×ÓÂ·¾¶¡£.
+	 * å°†ä¸€ä¸ªæ™®é€šçš„è§£è½¬æ¢æˆä¸€ä¸ªå¯ä»¥è¢«ExchangeBaseDeepå’ŒRelocateBseIntraæ“ä½œçš„è§£ï¼Œå³è·¯å¾„ä¸­åŒ…å«å­è·¯å¾„ã€‚.
 	 *
-	 * @param inst ËãÀıĞÅÏ¢¡£
-	 * @param s µ±Ç°½â¡£
-	 * @return ·µ»ØĞÂµÄ½â¡£
+	 * @param inst ç®—ä¾‹ä¿¡æ¯ã€‚
+	 * @param s å½“å‰è§£ã€‚
+	 * @return è¿”å›æ–°çš„è§£ã€‚
 	 */
 	public static ArrayList<Route> toDeep(Instance inst, ArrayList<Route> s){
 		ArrayList<Route> ns = new ArrayList<Route>();
@@ -196,11 +196,11 @@ public class VRPTW {
 	
 	
 	/**
-	 * ½«½â±£´æµ½ÎÄ¼ş¡£
+	 * å°†è§£ä¿å­˜åˆ°æ–‡ä»¶ã€‚
 	 *
-	 * @param file ÎÄ¼şÃû³Æ¡£
-	 * @param s µ±Ç°½â¡£
-	 * @throws IOException I/OÒì³£¡£
+	 * @param file æ–‡ä»¶åç§°ã€‚
+	 * @param s å½“å‰è§£ã€‚
+	 * @throws IOException I/Oå¼‚å¸¸ã€‚
 	 */
 	public static void write_solution(String file, ArrayList<Route> s) throws IOException{
 		BufferedWriter out = new BufferedWriter(new FileWriter(file));
