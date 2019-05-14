@@ -39,36 +39,34 @@ public class VRPTW {
 		// TODO Auto-generated method stub
 		double t1 = System.nanoTime();
 		Instance inst = load_instance("../data/homberger_1000/c1_10_2.txt", 1000);
-		//set the target number of vehicles
+		//set the target for minimizing the vehicle number
 		inst.m = 90;
-		//设置模式参数
-		inst.parameter.Mode.multi_thread_enable = true;
+		//set the pattern parameters
+		inst.parameter.Mode.multi_thread_enable = false;
 		System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "8");
-		//设置初始解参数
+		//set the parameters for the initial solution construction
 		inst.parameter.InitialSolution.log_print = false;
-		//设置禁忌搜索参数
+		//set the parameters for the tabu search
 		inst.parameter.TabuSearch.maximum_iteration = 50;
 		inst.parameter.TabuSearch.maximum_tabu_tenure = 100;
 		inst.parameter.TabuSearch.mininum_shake_tenure = 100;
 		inst.parameter.TabuSearch.minimum_shake_iteration = 50;
 		inst.parameter.TabuSearch.log_print = false;
 		inst.parameter.TabuSearch.log_detail = false;
-		//设置算子参数
+		//set the parameters for the operators
 		inst.parameter.Operator.insertion_prune_threshhold = 1.0;
 		inst.parameter.Operator.exchange_prune_threshhold = 1.0;
 		inst.parameter.Operator.cross_prune_threshhold = 1.0;
 		inst.parameter.Operator.remove_prune_threshhold = 0.0;
 		inst.parameter.Operator.route_cross_threshhold = 1.5;
-		//设置减少车辆算法参数
+		//set the parameters for the vehicle reduction
 		inst.parameter.VehicleReduction.insert_search_enable = true;
 		inst.parameter.VehicleReduction.cost_maximum_iteration = 100;
 		inst.parameter.VehicleReduction.outer_maximum_iteration = 100;
 		inst.parameter.VehicleReduction.random_remove_ratio = 0.05;
 		inst.parameter.VehicleReduction.log_print = true;
 		
-		System.out.println("Multiple Thread：" + inst.parameter.Mode.multi_thread_enable);
-		
-		//构造约束条件
+		//build the constraints
 		Constraint[] cnts = new Constraint[3];
 		MinimizeDistance.ConstraintData dist_dat = new MinimizeDistance.ConstraintData(inst.d, 1);
 		cnts[0] = new MinimizeDistance(dist_dat, 1);
@@ -77,7 +75,7 @@ public class VRPTW {
 		TimeWindowConstraint.ConstraintData tw_dat = new TimeWindowConstraint.ConstraintData(inst.e, inst.l, inst.t, inst.s);
 		cnts[2] = new TimeWindowConstraint(tw_dat, true, 100);
 		
-		//构造算法算子
+		//build the operators
 		Operator[] operators = new Operator[4];
 		double[] coefs = new double[4];
 		operators[0] = new RelocateBase(inst);
@@ -89,7 +87,7 @@ public class VRPTW {
 		operators[3] = new RelocateBaseIntra(inst);
 		coefs[3] = 1;
 		
-		//构造需要访问的节点集合
+		//buid the set of nodes that must be visited
 		ArrayList<Atr> atrs = new ArrayList<Atr>();
 		for(int i = 1; i < inst.n; i++){
 			atrs.add(new Atr(i));
@@ -98,7 +96,7 @@ public class VRPTW {
 		for(int i = 1; i < inst.n; i++)
 			exc[i] = true;
 		
-		//构造初始解
+		//construct the initial solution
 		Greedy greedy = new Greedy(inst, new InsertBase(inst, cnts));
 		ArrayList<Route> s = greedy.generate(atrs);
 		System.out.println(greedy.toString(s));
@@ -106,7 +104,7 @@ public class VRPTW {
 		System.out.println("feasibility of the initial solution>>>" + greedy.is_feasible(s) + "\t" + s.size() + "\t" + greedy.get_total_cost(s));
 		//System.exit(0);
 		
-		//最小化车辆数目
+		//miniize the vehicle number and the total travel distance
 		TabuSearch tabu = new TabuSearch(inst, operators, coefs);
 		VehicleMinimizeBase vmb = new VehicleMinimizeBase(inst);
 		VehicleReductionAlgo vra = new VehicleReductionAlgo(inst, tabu, vmb, inst.m, exc);
@@ -114,6 +112,7 @@ public class VRPTW {
 		vra.check(s, true, exc);
 		ArrayList<Route> bs = vra.solve(s);
 
+		//save the solution
 		vra.check(bs, true, exc);
 		System.out.println(vra.toString(bs));
 		double t2 = System.nanoTime();
