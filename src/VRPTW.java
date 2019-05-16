@@ -38,7 +38,7 @@ public class VRPTW {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		double t1 = System.nanoTime();
-		Instance inst = load_instance("../data/homberger_1000/c1_10_2.txt", 1000);
+		Instance inst = load_instance("../data/homberger_1000/C1_10_2.TXT", 1000);
 		//set the target for minimizing the vehicle number
 		inst.m = 90;
 		//set the pattern parameters
