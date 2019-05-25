@@ -54,15 +54,15 @@ public class VRPTW {
 		inst.parameter.TabuSearch.log_print = false;
 		inst.parameter.TabuSearch.log_detail = false;
 		//set the parameters for the operators
-		inst.parameter.Operator.insertion_prune_threshhold = 1.0;
-		inst.parameter.Operator.exchange_prune_threshhold = 1.0;
-		inst.parameter.Operator.cross_prune_threshhold = 1.0;
+		inst.parameter.Operator.insertion_prune_threshhold = 2.0;
+		inst.parameter.Operator.exchange_prune_threshhold = 2.0;
+		inst.parameter.Operator.cross_prune_threshhold = 2.0;
 		inst.parameter.Operator.remove_prune_threshhold = 0.0;
-		inst.parameter.Operator.route_cross_threshhold = 1.5;
+		inst.parameter.Operator.route_cross_threshhold = 2.0;
 		//set the parameters for the vehicle reduction
 		inst.parameter.VehicleReduction.insert_search_enable = true;
 		inst.parameter.VehicleReduction.cost_maximum_iteration = 100;
-		inst.parameter.VehicleReduction.outer_maximum_iteration = 100;
+		inst.parameter.VehicleReduction.outer_maximum_iteration = 300;
 		inst.parameter.VehicleReduction.random_remove_ratio = 0.05;
 		inst.parameter.VehicleReduction.log_print = true;
 		
