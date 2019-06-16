@@ -105,7 +105,7 @@ public class VRPTW {
 		//System.exit(0);
 		
 		//miniize the vehicle number and the total travel distance
-		TabuSearch tabu = new TabuSearch(inst, operators, coefs);
+		TabuSearch tabu = new TabuSearch(inst, operators, coefs, null);
 		VehicleMinimizeBase vmb = new VehicleMinimizeBase(inst);
 		VehicleReductionAlgo vra = new VehicleReductionAlgo(inst, tabu, vmb, inst.m, exc);
 		s = toDeep(inst, s);
